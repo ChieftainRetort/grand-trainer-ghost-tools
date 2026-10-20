@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Grand Trainer Ghost HUD</title>
+    <style>
+      body { font-family: monospace; color: #d7ffe1; background: rgba(0,0,0,0.55); padding: 12px; }
+      .row { display: flex; justify-content: space-between; }
+    </style>
+  </head>
+  <body>
+    <div class="row"><span>spirit</span><span id="spirit">-</span></div>
+    <div class="row"><span>flags</span><span id="flags">-</span></div>
+    <div class="row"><span>ghosts</span><span id="ghosts">0</span></div>
+    <script>
+      const b = window.ghostBridge || {};
+      document.getElementById("spirit").textContent = b.spiritState;
+      document.getElementById("flags").textContent = (b.trainerFlags || []).join(",") || "-";
+      document.getElementById("ghosts").textContent = b.ghostCount;
+    </script>
+  </body>
+</html>
