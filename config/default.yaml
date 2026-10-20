@@ -1,0 +1,24 @@
+# Default pipeline configuration for ghost_runner
+game:
+  process_name: "GrandTrainer.exe"
+  build: "2026.2.7"
+  module: "GrandTrainer.exe"
+
+pipeline:
+  stages:
+    - handlers.ghost_scan_handler
+    - processors.spirit_state_processor
+    - processors.trainer_flag_processor
+    - processors.entity_ghost_filter
+    - drivers.console_driver
+    - drivers.overlay_driver
+  tick_ms: 250
+
+memory:
+  scan_region: [0x140000000, 0x141000000]
+  pattern_ghost_flag: "48 8B 05 ?? ?? ?? ?? 48 85 C0 74 ?? 8B 40 20"
+  pattern_trainer_ptr: "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D8"
+
+logging:
+  level: INFO
+  file: logs/ghost_runner.log
