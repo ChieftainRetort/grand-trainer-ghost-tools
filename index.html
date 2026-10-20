@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Trainer Ghost Tools — ESP, Wallhack &amp; Entity Dumper for Windows</title>
+<meta name="description" content="Ghost tools for The Grand Trainer: ghost ESP, wallhack, entity dumper, and no-clip. Every spectral hitbox exposed and named in-game. Free and open source for Windows 10 / 11.">
+<style>
+  :root{
+    --bg-0:#05060f;
+    --bg-1:#0a0d1f;
+    --bg-2:#111331;
+    --ink:#e8eaf6;
+    --ink-dim:#a2a8c8;
+    --ink-faint:#6d7398;
+    --accent:#8b7cff;
+    --accent-2:#4be0d0;
+    --accent-3:#ff7ce0;
+    --line:rgba(160,170,255,.14);
+    --card:rgba(20,24,52,.62);
+    --card-hi:rgba(28,33,70,.78);
+    --radius:16px;
+    --maxw:1120px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    font-family:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    background:
+      radial-gradient(1100px 700px at 12% -8%, rgba(96,84,255,.28), transparent 60%),
+      radial-gradient(900px 620px at 92% 4%, rgba(75,224,208,.16), transparent 62%),
+      radial-gradient(1000px 800px at 50% 110%, rgba(255,124,224,.12), transparent 60%),
+      linear-gradient(170deg, var(--bg-1) 0%, var(--bg-0) 45%, var(--bg-2) 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    line-height:1.6;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;text-decoration:none}
+
+  .wrap{
+    width:100%;
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav-shell{
+    position:sticky;
+    top:0;
+    z-index:100;
+    padding:14px 0;
+    backdrop-filter:blur(16px) saturate(140%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    background:linear-gradient(180deg, rgba(10,13,31,.82), rgba(10,13,31,.55));
+    border-bottom:1px solid var(--line);
+  }
+
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    font-size:1.02rem;
+    letter-spacing:.2px;
+    white-space:nowrap;
+  }
+
+  .brand-mark{
+    width:30px;height:30px;
+    border-radius:9px;
+    display:grid;place-items:center;
+    font-size:.95rem;
+    background:linear-gradient(140deg, rgba(139,124,255,.9), rgba(75,224,208,.85));
+    box-shadow:0 0 22px rgba(139,124,255,.45);
+    color:#080a18;
+  }
+
+  .brand span b{
+    background:linear-gradient(92deg,#c9c2ff,#7ff0e2);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    list-style:none;
+  }
+
+  .nav-links a{
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:10px;
+    font-size:.9rem;
+    color:var(--ink-dim);
+    transition:color .18s ease, background .18s ease;
+  }
+
+  .nav-links a:hover{
+    color:var(--ink);
+    background:rgba(139,124,255,.12);
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    font-weight:600;
+    font-size:.94rem;
+    padding:12px 22px;
+    border-radius:12px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .16s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+    white-space:nowrap;
+  }
+
+  .btn-primary{
+    background:linear-gradient(135deg,#8b7cff 0%,#6a5cff 45%,#4be0d0 130%);
+    color:#070913;
+    box-shadow:0 10px 30px -8px rgba(120,110,255,.75), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 16px 38px -8px rgba(120,110,255,.9), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+
+  .btn-ghost{
+    background:rgba(255,255,255,.035);
+    border-color:rgba(170,178,255,.28);
+    color:var(--ink);
+    backdrop-filter:blur(6px);
+  }
+
+  .btn-ghost:hover{
+    transform:translateY(-2px);
+    background:rgba(139,124,255,.14);
+    border-color:rgba(170,178,255,.5);
+  }
+
+  .nav .btn{padding:10px 18px;font-size:.88rem}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:86px 0 64px;
+    text-align:center;
+    overflow:hidden;
+  }
+
+  .hero::before{
+    content:"";
+    position:absolute;
+    inset:-30% 0 auto 0;
+    height:640px;
+    background:radial-gradient(560px 300px at 50% 40%, rgba(139,124,255,.22), transparent 70%);
+    pointer-events:none;
+  }
+
+  .hero .wrap{position:relative}
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:7px 16px 7px 12px;
+    border-radius:999px;
+    font-size:.79rem;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    font-weight:600;
+    color:#c9c2ff;
+    background:rgba(139,124,255,.1);
+    border:1px solid rgba(139,124,255,.34);
+    box-shadow:0 0 26px -6px rgba(139,124,255,.5);
+    margin-bottom:26px;
+  }
+
+  .pill .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--accent-2);
+    box-shadow:0 0 10px var(--accent-2);
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.45;transform:scale(.82)}
+  }
+
+  h1{
+    font-size:clamp(2.15rem, 5.6vw, 4rem);
+    line-height:1.08;
+    letter-spacing:-1.4px;
+    font-weight:800;
+    margin:0 auto 22px;
+    max-width:900px;
+    background:linear-gradient(96deg,#ffffff 4%,#c3baff 38%,#7ff0e2 74%,#ff9ce6 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-wrap:balance;
+  }
+
+  .hero p.lede{
+    max-width:660px;
+    margin:0 auto 34px;
+    color:var(--ink-dim);
+    font-size:clamp(1rem,1.5vw,1.12rem);
+  }
+
+  .hero p.lede strong{color:#d5d1ff;font-weight:600}
+
+  .hero-cta{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:46px;
+  }
+
+  .hero-cta .btn{padding:15px 30px;font-size:1rem}
+
+  .stats{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    max-width:860px;
+    margin:0 auto;
+  }
+
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:.85rem;
+    color:var(--ink-dim);
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--line);
+    backdrop-filter:blur(8px);
+  }
+
+  .chip b{color:var(--ink);font-weight:700}
+
+  .chip .ico{font-size:.95rem;filter:saturate(1.2)}
+
+  /* ---------- SECTION HEADS ---------- */
+  section{padding:74px 0}
+
+  .sec-head{
+    text-align:center;
+    margin:0 auto 48px;
+    max-width:640px;
+  }
+
+  .kicker{
+    font-size:.76rem;
+    letter-spacing:2.4px;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--accent-2);
+    margin-bottom:12px;
+  }
+
+  h2{
+    font-size:clamp(1.6rem,3.4vw,2.4rem);
+    letter-spacing:-.8px;
+    line-height:1.15;
+    font-weight:800;
+    margin-bottom:14px;
+  }
+
+  .sec-head p{color:var(--ink-dim);font-size:.97rem}
+
+  /* ---------- FEATURES ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+  }
+
+  .card{
+    position:relative;
+    padding:28px 24px 26px;
+    border-radius:var(--radius);
+    background:var(--card);
+    border:1px solid var(--line);
+    backdrop-filter:blur(12px);
+    overflow:hidden;
+    transition:transform .24s cubic-bezier(.2,.7,.3,1), box-shadow .24s ease, background .24s ease, border-color .24s ease;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    opacity:.85;
+  }
+
+  .card:nth-child(2)::before{background:linear-gradient(90deg,#4be0d0,#6a5cff)}
+  .card:nth-child(3)::before{background:linear-gradient(90deg,#ff7ce0,#8b7cff)}
+  .card:nth-child(4)::before{background:linear-gradient(90deg,#8b7cff,#ff9ce6)}
+  .card:nth-child(5)::before{background:linear-gradient(90deg,#4be0d0,#ff7ce0)}
+  .card:nth-child(6)::before{background:linear-gradient(90deg,#6a5cff,#4be0d0)}
+
+  .card:hover{
+    transform:translateY(-7px);
+    background:var(--card-hi);
+    border-color:rgba(170,178,255,.34);
+    box-shadow:0 22px 46px -20px rgba(90,80,220,.75);
+  }
+
+  .card .emoji{
+    display:grid;
+    place-items:center;
+    width:46px;height:46px;
+    border-radius:12px;
+    font-size:1.35rem;
+    margin-bottom:16px;
+    background:rgba(139,124,255,.13);
+    border:1px solid rgba(139,124,255,.24);
+  }
+
+  .card h3{
+    font-size:1.04rem;
+    font-weight:700;
+    letter-spacing:-.2px;
+    margin-bottom:8px;
+  }
+
+  .card p{
+    font-size:.89rem;
+    color:var(--ink-dim);
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{
+    position:relative;
+    max-width:720px;
+    margin:0 auto;
+    padding-left:0;
+  }
+
+  .steps::before{
+    content:"";
+    position:absolute;
+    left:27px;
+    top:18px;
+    bottom:18px;
+    width:2px;
+    background:linear-gradient(180deg, rgba(139,124,255,.05), var(--accent), var(--accent-2), rgba(75,224,208,.05));
+    border-radius:2px;
+  }
+
+  .step{
+    position:relative;
+    display:flex;
+    gap:22px;
+    padding:0 0 34px 0;
+  }
+
+  .step:last-child{padding-bottom:0}
+
+  .step-num{
+    flex:0 0 56px;
+    width:56px;height:56px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-weight:800;
+    font-size:1.05rem;
+    color:#0a0c1c;
+    background:linear-gradient(135deg,#a79cff,#6a5cff 55%,#4be0d0);
+    box-shadow:0 0 0 6px rgba(10,13,31,.9), 0 0 30px -6px rgba(139,124,255,.8);
+    position:relative;
+    z-index:1;
+  }
+
+  .step-body{
+    padding-top:6px;
+  }
+
+  .step-body h3{
+    font-size:1.06rem;
+    font-weight:700;
+    margin-bottom:6px;
+    letter-spacing:-.2px;
+  }
+
+  .step-body p{
+    font-size:.92rem;
+    color:var(--ink-dim);
+    max-width:520px;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq{
+    max-width:760px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  details{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    backdrop-filter:blur(10px);
+    overflow:hidden;
+    transition:border-color .2s ease, background .2s ease;
+  }
+
+  details[open]{
+    background:var(--card-hi);
+    border-color:rgba(170,178,255,.3);
+  }
+
+  summary{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:18px 22px;
+    font-weight:600;
+    font-size:.98rem;
+    color:var(--ink);
+    user-select:none;
+  }
+
+  summary::-webkit-details-marker{display:none}
+
+  summary .plus{
+    flex:0 0 auto;
+    width:26px;height:26px;
+    display:grid;place-items:center;
+    border-radius:8px;
+    background:rgba(139,124,255,.14);
+    border:1px solid rgba(139,124,255,.26);
+    color:var(--accent);
+    font-size:1.05rem;
+    line-height:1;
+    transition:transform .28s cubic-bezier(.2,.7,.3,1), background .2s ease, color .2s ease;
+  }
+
+  details[open] summary .plus{
+    transform:rotate(45deg);
+    background:rgba(75,224,208,.16);
+    border-color:rgba(75,224,208,.4);
+    color:var(--accent-2);
+  }
+
+  details .answer{
+    padding:0 22px 20px;
+    font-size:.9rem;
+    color:var(--ink-dim);
+    max-width:640px;
+  }
+
+  details .answer code{
+    font-family:ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size:.84em;
+    padding:1px 6px;
+    border-radius:6px;
+    background:rgba(139,124,255,.14);
+    color:#cfc9ff;
+  }
+
+  /* ---------- CTA BANNER ---------- */
+  .cta-band{
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    padding:64px 32px;
+    text-align:center;
+    background:
+      radial-gradient(520px 240px at 50% 0%, rgba(139,124,255,.34), transparent 70%),
+      linear-gradient(160deg, rgba(30,34,74,.92), rgba(12,15,36,.95));
+    border:1px solid rgba(170,178,255,.22);
+    box-shadow:0 30px 80px -40px rgba(90,80,220,.9);
+  }
+
+  .cta-band::after{
+    content:"";
+    position:absolute;
+    width:420px;height:420px;
+    left:50%;top:-260px;
+    transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(75,224,208,.28), transparent 70%);
+    pointer-events:none;
+  }
+
+  .cta-band h2{
+    position:relative;
+    margin-bottom:14px;
+  }
+
+  .cta-band p{
+    position:relative;
+    color:var(--ink-dim);
+    max-width:520px;
+    margin:0 auto 30px;
+    font-size:.97rem;
+  }
+
+  .cta-band .btn{
+    position:relative;
+    padding:16px 34px;
+    font-size:1.02rem;
+  }
+
+  .cta-note{
+    position:relative;
+    display:block;
+    margin-top:16px;
+    font-size:.78rem;
+    color:var(--ink-faint);
+    letter-spacing:.3px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:34px 0 44px;
+    margin-top:20px;
+  }
+
+  .foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:.85rem;
+    color:var(--ink-faint);
+  }
+
+  .foot a{
+    color:var(--ink-dim);
+    transition:color .18s ease;
+  }
+
+  .foot a:hover{color:var(--accent-2)}
+
+  .foot-left{display:flex;align-items:center;gap:10px}
+
+  .foot-left .mini{
+    width:22px;height:22px;
+    border-radius:7px;
+    display:grid;place-items:center;
+    font-size:.7rem;
+    background:linear-gradient(140deg, rgba(139,124,255,.9), rgba(75,224,208,.8));
+    color:#080a18;
+    font-weight:800;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+  }
+
+  @media (max-width:640px){
+    .nav-links{display:none}
+    .nav-shell{padding:10px 0}
+    .brand{font-size:.94rem}
+    .nav .btn{padding:9px 15px;font-size:.82rem}
+
+    .hero{padding:58px 0 44px}
+    h1{letter-spacing:-.9px}
+    .hero-cta{gap:10px}
+    .hero-cta .btn{width:100%;padding:14px 22px}
+    .hero-cta{flex-direction:column;align-items:stretch}
+
+    .stats{gap:8px}
+    .chip{font-size:.78rem;padding:8px 14px}
+
+    section{padding:52px 0}
+    .grid{grid-template-columns:1fr}
+    .card{padding:24px 20px}
+
+    .steps::before{left:23px}
+    .step-num{flex:0 0 48px;width:48px;height:48px;font-size:.95rem}
+    .step{gap:16px;padding-bottom:28px}
+
+    .cta-band{padding:46px 22px;border-radius:18px}
+
+    .foot{flex-direction:column;text-align:center;justify-content:center}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= NAV ================= -->
+  <div class="nav-shell">
+    <div class="wrap">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">👻</span>
+          <span>Grand&nbsp;Trainer&nbsp;<b>Ghost&nbsp;Tools</b></span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+
+        <a class="btn btn-primary" href="https://gitscore.cc" rel="noopener">Download</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero" id="top">
+    <div class="wrap">
+      <span class="pill"><span class="dot"></span>There Are No Ghosts at the Grand Trainer</span>
+
+      <h1>Every Spectral Hitbox, Exposed &amp; Named In-Game</h1>
+
+      <p class="lede">
+        <strong>Grand Trainer Ghost Tools</strong> is a Windows toolkit for <em>The Grand Trainer</em> that lifts the veil
+        on the station's unseen residents. Ghost ESP, wallhack, a live entity dumper, and no-clip — so you can
+        track, name, and inspect every phantom before it ever thinks about scaring you.
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://gitscore.cc" rel="noopener">
+          <span aria-hidden="true">⬇</span> Download for Windows
+        </a>
+        <a class="btn btn-ghost" href="https://gitscore.cc" rel="noopener">
+          <span aria-hidden="true">🐙</span> View on GitHub
+        </a>
+      </div>
+
+      <div class="stats">
+        <div class="chip"><span class="ico" aria-hidden="true">📥</span><b>48,200+</b> downloads</div>
+        <div class="chip"><span class="ico" aria-hidden="true">🏷️</span>Version <b>v2.4.1</b></div>
+        <div class="chip"><span class="ico" aria-hidden="true">🪟</span><b>Windows 10 / 11</b></div>
+        <div class="chip"><span class="ico" aria-hidden="true">🔓</span><b>Free &amp; open source</b></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">The Toolkit</div>
+        <h2>Six Ways to See the Unseen</h2>
+        <p>Each tool is built specifically for The Grand Trainer's entity model. Toggle what you need, keep the rest quiet.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="emoji" aria-hidden="true">👁️</div>
+          <h3>Ghost ESP</h3>
+          <p>Silhouettes every spectral entity through walls and geometry, with distance readouts so you always know what's drifting toward you.</p>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🧱</div>
+          <h3>Wallhack</h3>
+          <p>Reveals the station's hidden corridors and sealed rooms. Map the Grand Trainer's layout without ever opening a door.</p>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🗂️</div>
+          <h3>Entity Dumper</h3>
+          <p>Dumps every live entity to a readable list — IDs, classes, positions, and states. The fastest way to learn what the game actually spawns.</p>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🚪</div>
+          <h3>No-Clip</h3>
+          <p>Fly through walls, floors, and ceilings to inspect out-of-bounds geometry and any ghost that thinks it's hiding.</p>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🏷️</div>
+          <h3>Named Hitboxes</h3>
+          <p>Every spectral hitbox gets an on-screen label. No more guessing which shape
